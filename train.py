@@ -51,15 +51,19 @@ def get_loaders():
 
 
 
-def compute_loss(model, loader):
+def compute_loss(model, loader, loss_fn):
     model.eval()
     losses = []
     for i, data in enumerate(loader):
-        data = data.to(configs.DEVICE)
-        embeddings = model(data)
-        distance_matrix = compute_distance_matrix(embeddings) 
-        triplets = form_triplets(distance_matrix)
-        loss = loss(triplets)
+        input = input.to(configs.DEVICE)
+        embeddings = model(input)
+        B, N, L = embeddings.shape
+        embeddings = embeddings.view(B * N, L)  # (n, d)
+        distance_matrix = compute_distance_matrix(embeddings)
+        pairs = get_n_p_pairs(distance_matrix)
+        ps, ns = form_triplets(embeddings, pairs)
+        loss = loss_fn(embeddings, ps, ns)
+    
         losses.append(loss.item())
 
     return sum(losses)/len(losses)
@@ -100,7 +104,7 @@ def train(session_path, train_loader, test_loader):
     writer = SummaryWriter(f"{session_path}/runs/experiment1")
     model = CringeNet().to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
-    loss = TripletLoss(configs.ALPHA)
+    loss_fn = TripletLoss(configs.ALPHA)
     print(configs.DEVICE)
     for epoch in range(configs.EPOCHS):
         model.train()
@@ -113,7 +117,7 @@ def train(session_path, train_loader, test_loader):
             distance_matrix = compute_distance_matrix(embeddings)
             pairs = get_n_p_pairs(distance_matrix)
             ps, ns = form_triplets(embeddings, pairs)
-            loss = loss(embeddings, ps, ns)
+            loss = loss_fn(embeddings, ps, ns)
             writer.add_scalar("Loss/train", loss.item(), epoch)
             loss.backward()
             optim.step()
