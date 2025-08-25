@@ -7,7 +7,7 @@ class CringeNet(nn.Module):
         super(CringeNet, self).__init__()
         self.backbone = convnext_small(weights = ConvNeXt_Small_Weights).features
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
-        self.embedder = nn.Linear(1024, configs.EMBEDDING_DIM)
+        self.embedder = nn.Linear(768, configs.EMBEDDING_DIM)
         
 
         # this tweak was suggested by GPT
