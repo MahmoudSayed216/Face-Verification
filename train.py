@@ -99,6 +99,50 @@ def form_triplets(embeddings, n_p_pairs):
     return positives, negatives
 
 
+
+def compute_accuracy(model, loader):
+    """
+    Compute verification accuracy for a Siamese/triplet network.
+    Returns the accuracy (0-1).
+    """
+    model.eval()
+    distances = []
+    labels = []
+    with torch.no_grad():
+        for input in loader:
+            input = input.to(configs.DEVICE)
+            embeddings = model(input)  # (B, N, L)
+            B, N, L = embeddings.shape
+            embeddings = embeddings.view(B * N, L)
+            distance_matrix = compute_distance_matrix(embeddings)
+            pairs = get_n_p_pairs(distance_matrix)
+            ps, ns = form_triplets(embeddings, pairs)
+            
+            # distances
+            pos_dist = torch.norm(embeddings - ps, dim=1)  # D(a,p)
+            neg_dist = torch.norm(embeddings - ns, dim=1)  # D(a,n)
+            
+            distances.extend(pos_dist.cpu().numpy())
+            labels.extend([1]*len(pos_dist))  # 1 = same
+            distances.extend(neg_dist.cpu().numpy())
+            labels.extend([0]*len(neg_dist))  # 0 = different
+    
+    distances = torch.tensor(distances)
+    labels = torch.tensor(labels)
+    
+    # simple threshold selection: midpoint between mean pos/neg distances
+    pos_mean = distances[labels==1].mean()
+    neg_mean = distances[labels==0].mean()
+    threshold = (pos_mean + neg_mean) / 2
+    
+    preds = (distances < threshold).int()
+    accuracy = (preds == labels).float().mean().item()
+    return accuracy
+
+
+
+
+
 def train(session_path, train_loader, test_loader):
     #TODO: tensorboard
     tensorboard_logs_path = f"{session_path}/runs/experiment1"
@@ -131,7 +175,9 @@ def train(session_path, train_loader, test_loader):
 
 
         test_loss = compute_loss(model, test_loader, loss_fn)
+        accuracy =  compute_accuracy(model, test_loader)
         print("test loss: ",test_loss)
+        print("test accuracy: ", accuracy)
         scheduler.step(test_loss)
         print("LEARNING RATE: ", scheduler.get_last_lr())
         writer.add_scalar("Loss/test", test_loss)
