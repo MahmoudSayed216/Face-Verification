@@ -125,7 +125,7 @@ def train(session_path, train_loader, test_loader):
                 print(loss.item())
 
 
-        test_loss = compute_loss(model, test_loader)
+        test_loss = compute_loss(model, test_loader, loss_fn)
         print(test_loss)
         writer.add_scalar("Loss/test", test_loss.item())
 
