@@ -54,7 +54,7 @@ def get_loaders():
 def compute_loss(model, loader, loss_fn):
     model.eval()
     losses = []
-    for i, data in enumerate(loader):
+    for i, input in enumerate(loader):
         input = input.to(configs.DEVICE)
         embeddings = model(input)
         B, N, L = embeddings.shape
@@ -121,13 +121,13 @@ def train(session_path, train_loader, test_loader):
             writer.add_scalar("Loss/train", loss.item(), epoch)
             loss.backward()
             optim.step()
-            if i%50 ==0:
+            if i%20 ==0:
                 print(loss.item())
 
 
         test_loss = compute_loss(model, test_loader, loss_fn)
         print(test_loss)
-        writer.add_scalar("Loss/test", test_loss.item())
+        writer.add_scalar("Loss/test", test_loss)
 
 
 
