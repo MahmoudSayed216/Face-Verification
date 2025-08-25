@@ -110,21 +110,21 @@ def train(session_path, train_loader, test_loader):
             embeddings = model(input)
             B, N, L = embeddings.shape
             embeddings = embeddings.view(B * N, L)  # (n, d)
-            # distance_matrix = compute_distance_matrix(embeddings) 
-            # times = timeit.repeat(lambda : compute_distance_matrix(embeddings), repeat=30, number=1)
-            # print("AVG: ", sum(times)/len(times))
             distance_matrix = compute_distance_matrix(embeddings)
-            # print(distance_matrix)
             pairs = get_n_p_pairs(distance_matrix)
             ps, ns = form_triplets(embeddings, pairs)
             loss = loss(embeddings, ps, ns)
             writer.add_scalar("Loss/train", loss.item(), epoch)
             loss.backward()
             optim.step()
+            if i%50 ==0:
+                print(loss.item())
 
 
         test_loss = compute_loss(model, test_loader)
-        writer.add_scalar("Loss/test")
+        print(test_loss)
+        writer.add_scalar("Loss/test", test_loss.item())
+
 
 
     
