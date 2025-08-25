@@ -1,5 +1,5 @@
 #model
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0001
 EPOCHS = 30
 ALPHA = 0.2
 EMBEDDING_DIM = 512
@@ -8,10 +8,10 @@ EMBEDDING_DIM = 512
 PER_SUBJECT_SAMPLES = 4
 
 # env
-ENV = "KAGGLE"
+ENV = "LOCAL"
 DATA_PATH = "/home/mahmoud-sayed/Desktop/Datasets/VGGFace2" if ENV == "LOCAL" else "/kaggle/input/vggface2"
 DEVICE = "cpu" if ENV == "LOCAL" else "cuda"
-OUTPUT_DIR = "/home/mahmoud-sayed/Desktop/Code/Python/Face Verification 2/outputs" if ENV == "LOCAL" else "/kaggle/working"
+OUTPUT_DIR = "/home/mahmoud-sayed/Desktop/Code/Python/Face Verification 2" if ENV == "LOCAL" else "/kaggle/working"
 
 # logger
 DEBUG = True

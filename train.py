@@ -10,6 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from distancesComputer import compute_distance_matrix
 from logger import Logger 
+import webbrowser
 
 
 def get_loaders():
@@ -100,8 +101,11 @@ def form_triplets(embeddings, n_p_pairs):
 
 def train(session_path, train_loader, test_loader):
     #TODO: tensorboard
+    tensorboard_logs_path = f"{session_path}/runs/experiment1"
+    writer = SummaryWriter(tensorboard_logs_path)
+    os.system(f"tensorboard --logdir={session_path}/runs &")
+    webbrowser.open("http://localhost:6006")
 
-    writer = SummaryWriter(f"{session_path}/runs/experiment1")
     model = CringeNet().to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
     loss_fn = TripletLoss(configs.ALPHA)
@@ -122,21 +126,22 @@ def train(session_path, train_loader, test_loader):
             loss.backward()
             optim.step()
             if i%20 ==0:
-                print(loss.item())
+                print("train batch loss: ", loss.item())
 
 
         test_loss = compute_loss(model, test_loader, loss_fn)
-        print(test_loss)
+        print("test loss: ",test_loss)
         writer.add_scalar("Loss/test", test_loss)
 
-
+    writer.close()
 
     
 
 
 
 def prepare_training_session_dir():
-    session_folder_path = configs.OUTPUT_DIR
+    os.makedirs(os.path.join(configs.OUTPUT_DIR, "output"), exist_ok=True)
+    session_folder_path = os.path.join(configs.OUTPUT_DIR, "output")
     current_attemps_count = len(os.listdir(session_folder_path))
     current_training_attempt_index = current_attemps_count+1
     final_path = os.path.join(session_folder_path,"session"+str(current_training_attempt_index)) 

@@ -9,7 +9,8 @@ class CringeNet(nn.Module):
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
         self.embedder = nn.Linear(768, configs.EMBEDDING_DIM)
         
-
+        for p in self.backbone.parameters():
+            p.requires_grad = False
         # this tweak was suggested by GPT
         nn.init.xavier_uniform_(self.embedder.weight)
         if self.embedder.bias is not None:
