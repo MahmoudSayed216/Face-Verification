@@ -106,6 +106,7 @@ def train(session_path, train_loader, test_loader):
         model.train()
         for i, input in enumerate(train_loader):
             optim.zero_grad()
+            input = input.to(configs.DEVICE)
             embeddings = model(input)
             B, N, L = embeddings.shape
             embeddings = embeddings.view(B * N, L)  # (n, d)

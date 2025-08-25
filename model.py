@@ -1,11 +1,11 @@
-from torchvision.models import convnext_base, ConvNeXt_Base_Weights
+from torchvision.models import convnext_small, ConvNeXt_Small_Weights
 import torch.nn as nn
 import configs
 
 class CringeNet(nn.Module):
     def __init__(self):
         super(CringeNet, self).__init__()
-        self.backbone = convnext_base(weights = None).features
+        self.backbone = convnext_small(weights = ConvNeXt_Small_Weights).features
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
         self.embedder = nn.Linear(1024, configs.EMBEDDING_DIM)
         
