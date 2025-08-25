@@ -11,6 +11,12 @@ class CringeNet(nn.Module):
         
         for p in self.backbone.parameters():
             p.requires_grad = False
+
+        for name, param in self.backbone.named_parameters():
+            if "7" in name:
+                param.requires_grad = True
+
+
         # this tweak was suggested by GPT
         nn.init.xavier_uniform_(self.embedder.weight)
         if self.embedder.bias is not None:
@@ -19,11 +25,11 @@ class CringeNet(nn.Module):
 
     def forward(self, images):  # (B, N, C, H, W)
         B, N, C, H, W = images.shape
-        x = images.view(B * N, C, H, W)        # flatten batch + images
-        x = self.backbone(x)                   # (B*N, 1024, H', W')
-        x = self.adaptive_avg_pooling(x)       # (B*N, 1024, 1, 1)
-        x = x.view(B * N, -1)                  # (B*N, 1024)
-        x = self.embedder(x)                   # (B*N, EMBEDDING_DIM)
+        x = images.view(B * N, C, H, W)        
+        x = self.backbone(x)                   
+        x = self.adaptive_avg_pooling(x)       
+        x = x.view(B * N, -1)                  
+        x = self.embedder(x)                   
         x = nn.functional.normalize(x, p=2, dim=1)
-        x = x.view(B, N, -1)                   # (B, N, EMBEDDING_DIM)
+        x = x.view(B, N, -1)                   
         return x

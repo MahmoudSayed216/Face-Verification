@@ -5,8 +5,12 @@ from logger import Logger
 
 def compute_distance_matrix(embeddings: torch.Tensor):
     
-    dist_sq = 2  - 2 * embeddings @ embeddings.t()
-    dist_sq = torch.clamp(dist_sq, min=0.0)  # numerical stability
+    # dist_sq = 2  - 2 * embeddings @ embeddings.t()
+    # dist_sq = torch.clamp(dist_sq, min=0.0)  # numerical stability
 
-    matrix = torch.sqrt(dist_sq)
-    return matrix
+    # matrix = torch.sqrt(dist_sq)
+    # return matrix
+
+    # For L2 normalized embeddings, cosine distance = 1 - cosine_similarity
+    cosine_sim = embeddings @ embeddings.t()
+    return 1 - cosine_sim

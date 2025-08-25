@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from distancesComputer import compute_distance_matrix
 from logger import Logger 
 import webbrowser
-
+import random
 
 def get_loaders():
     test_transforms = T.Compose([
@@ -71,19 +71,26 @@ def compute_loss(model, loader, loss_fn):
 
 
 
-
 def get_n_p_pairs(distance_matrix):
     n_p_pairs = []
     for i in range(len(distance_matrix)):
-        row :torch.Tensor = distance_matrix[i].clone()
-        lower_bound = i - i%configs.PER_SUBJECT_SAMPLES
-        upper_bound = lower_bound + configs.PER_SUBJECT_SAMPLES
-
-        row[lower_bound:upper_bound] = float('inf')
+        row = distance_matrix[i].clone()
+        
+        # Find the range of images for the same person
+        person_start = (i // configs.PER_SUBJECT_SAMPLES) * configs.PER_SUBJECT_SAMPLES
+        person_end = person_start + configs.PER_SUBJECT_SAMPLES
+        
+        # Mask out same person's embeddings for negative selection
+        row[person_start:person_end] = float('inf')
         neg_idx = row.argmin(0)
-        pos_idx = i-1 if i%configs.PER_SUBJECT_SAMPLES != 0 else 1
+        
+        # Pick a random positive from the same person (excluding self)
+        same_person_indices = list(range(person_start, person_end))
+        same_person_indices.remove(i)  # Remove anchor itself
+        pos_idx = random.choice(same_person_indices)
+        
         n_p_pairs.append((pos_idx, neg_idx))
-    return n_p_pairs        
+    return n_p_pairs
 
 def form_triplets(embeddings, n_p_pairs):
     # anchors = embeddings
