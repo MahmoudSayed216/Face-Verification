@@ -103,11 +103,12 @@ def train(session_path, train_loader, test_loader):
     #TODO: tensorboard
     tensorboard_logs_path = f"{session_path}/runs/experiment1"
     writer = SummaryWriter(tensorboard_logs_path)
-    os.system(f"tensorboard --logdir={session_path}/runs &")
+    # os.system(f"tensorboard --logdir={session_path}/runs &")
     # webbrowser.open("http://localhost:6006")
 
     model = CringeNet().to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.1, patience=5, min_lr=0.00001)
     loss_fn = TripletLoss(configs.ALPHA)
     print(configs.DEVICE)
     for epoch in range(configs.EPOCHS):
@@ -131,6 +132,8 @@ def train(session_path, train_loader, test_loader):
 
         test_loss = compute_loss(model, test_loader, loss_fn)
         print("test loss: ",test_loss)
+        scheduler.step(test_loss)
+        print("LEARNING RATE: ", scheduler.get_last_lr())
         writer.add_scalar("Loss/test", test_loss)
 
     writer.close()
