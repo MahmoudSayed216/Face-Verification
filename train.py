@@ -101,7 +101,7 @@ def train(session_path, train_loader, test_loader):
     model = CringeNet().to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
     loss = TripletLoss(configs.ALPHA)
-
+    print(configs.DEVICE)
     for epoch in range(configs.EPOCHS):
         model.train()
         for i, input in enumerate(train_loader):
