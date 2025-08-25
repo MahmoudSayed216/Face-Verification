@@ -104,7 +104,7 @@ def train(session_path, train_loader, test_loader):
     tensorboard_logs_path = f"{session_path}/runs/experiment1"
     writer = SummaryWriter(tensorboard_logs_path)
     os.system(f"tensorboard --logdir={session_path}/runs &")
-    webbrowser.open("http://localhost:6006")
+    # webbrowser.open("http://localhost:6006")
 
     model = CringeNet().to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
