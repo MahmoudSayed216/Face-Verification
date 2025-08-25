@@ -8,7 +8,7 @@ EMBEDDING_DIM = 512
 PER_SUBJECT_SAMPLES = 4
 
 # env
-ENV = "LOCAL"
+ENV = "KAGGLE"
 DATA_PATH = "/home/mahmoud-sayed/Desktop/Datasets/VGGFace2" if ENV == "LOCAL" else "/kaggle/input/vggface2"
 DEVICE = "cpu" if ENV == "LOCAL" else "cuda"
 OUTPUT_DIR = "/home/mahmoud-sayed/Desktop/Code/Python/Face Verification 2" if ENV == "LOCAL" else "/kaggle/working"
