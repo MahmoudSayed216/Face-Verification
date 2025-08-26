@@ -29,7 +29,7 @@ def get_a_n_p_pairs(distance_matrix):
         row[person_start:person_end] = float('inf')
         
         # Get top-k hardest negatives (you can adjust k)
-        k_hardest_negatives = 3  # Adjust this number based on your needs
+        k_hardest_negatives = 4  # Adjust this number based on your needs
         _, neg_indices = torch.topk(row, k_hardest_negatives, largest=False)
         
         # Create triplets: anchor with each positive and each hard negative
