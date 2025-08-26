@@ -163,6 +163,7 @@ def train(session_path, train_loader, test_loader):
     loss_fn = TripletLoss(configs.ALPHA)
     print(configs.DEVICE)
     for epoch in range(configs.EPOCHS):
+        print(f"EPOCH: {epoch}")
         model.train()
         for i, input in enumerate(train_loader):
             optim.zero_grad()
@@ -188,6 +189,7 @@ def train(session_path, train_loader, test_loader):
         scheduler.step(test_loss)
         print("LEARNING RATE: ", scheduler.get_last_lr())
         writer.add_scalar("Loss/test", test_loss)
+        print("_"*30)
 
     writer.close()
 
