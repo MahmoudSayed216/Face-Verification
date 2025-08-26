@@ -20,7 +20,7 @@ class CheckpointHandler:
             },
             f'{self.output_path}/{_type}.pth')
 
-        Logger.CHECKPOINT(f"{_type} updated")
+        Logger.checkpoint(f"{_type} updated")
         # self.writer.add_line(f"{_type} updated")
 
     def _save_if_improved(self, current_value, epoch):
