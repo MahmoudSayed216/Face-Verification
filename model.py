@@ -17,7 +17,7 @@ class CringeNet(nn.Module):
             p.requires_grad = False
 
         for name, param in self.backbone.named_parameters():
-            if "7" in name or "6" in name:
+            if "7" in name or "6" in name or "5" in name:
                 param.requires_grad = True
 
 

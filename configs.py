@@ -13,10 +13,11 @@ DATA_PATH = "/home/mahmoud-sayed/Desktop/Datasets/VGGFace2" if ENV == "LOCAL" el
 DEVICE = "cpu" if ENV == "LOCAL" else "cuda"
 OUTPUT_DIR = "/home/mahmoud-sayed/Desktop/Code/Python/Face Verification 2" if ENV == "LOCAL" else "/kaggle/working"
 
-# logger
+# logs
 DEBUG = True
 CHECKPOINT = True
 LOG = True
+PRINT_EVERY = 20
 
 #train
 BATCH_SIZE = 10
