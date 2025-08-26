@@ -1,7 +1,7 @@
 import torch
 #model
 LEARNING_RATE = 0.0001
-EPOCHS = 150
+EPOCHS = 200
 ALPHA = 0.3
 EMBEDDING_DIM = 128
 
@@ -28,5 +28,5 @@ SAVE_EVERY = 4
 ##on plateau
 PATIENCE = 8
 LR_REDUCTION_FACTOR = 0.5
-MIN_LR = 0.00001
+MIN_LR = 0.0000005
 MODE = 'min'
