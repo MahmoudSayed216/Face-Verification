@@ -56,7 +56,9 @@ def train(session_path, train_loader, test_loader):
     model = CringeNet().to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
     checkpointer = CheckpointHandler(model, optim, configs.SAVE_EVERY, session_path)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode=configs.MODE, factor=configs.LR_REDUCTION_FACTOR, patience=configs.PATIENCE, min_lr=configs.MIN_LR)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode=configs.MODE, factor=configs.LR_REDUCTION_FACTOR, patience=configs.PATIENCE, min_lr=configs.MIN_LR)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, mode=configs.MODE, factor=configs.LR_REDUCTION_FACTOR, patience=configs.PATIENCE, min_lr=configs.MIN_LR)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=40, eta_min=configs.MIN_LR)
     loss_fn = TripletLoss(configs.ALPHA)
     print(configs.DEVICE)
     for epoch in range(configs.EPOCHS):
@@ -78,7 +80,6 @@ def train(session_path, train_loader, test_loader):
             if i%configs.PRINT_EVERY ==0:
                 print("train batch loss: ", loss.item())
 
-
         test_loss = compute_triplet_loss(model, test_loader, loss_fn)
         accuracy_scores =  compute_accuracy_score(model, test_loader)
         print("test loss: ",test_loss)
@@ -87,7 +88,8 @@ def train(session_path, train_loader, test_loader):
             print(f"accuracy @{th:.2f}: ", acc, " [dynamic threhsold]" if i == 0 else "")
             i+=1
         checkpointer.save_model(accuracy_scores[0][1], epoch)
-        scheduler.step(test_loss)
+        # scheduler.step(test_loss)
+        scheduler.step()
         print("LEARNING RATE: ", scheduler.get_last_lr())
         writer.add_scalar("Loss/test", test_loss)
         print("*"*30)

@@ -59,11 +59,12 @@ def compute_accuracy_score(model, loader):
     pos_mean = distances[labels==1].mean()
     neg_mean = distances[labels==0].mean()
     dynamic_threshold = (pos_mean + neg_mean) / 2
-    th1 = 0.3
-    th2 = 0.4
-    th3 = 0.5
-    th4 = 0.7
-    th5 = 0.9
+    th1 = 0.7
+    th2 = 0.8
+    th3 = 0.9
+    th4 = 1.0
+    th5 = 1.1
+    th6 = 1.2
     
     preds_at_dynamic_th = (distances < dynamic_threshold).int()
     preds_at_th1 = (distances < th1).int()
@@ -71,6 +72,7 @@ def compute_accuracy_score(model, loader):
     preds_at_th3 = (distances < th3).int()
     preds_at_th4 = (distances < th4).int()
     preds_at_th5 = (distances < th5).int()
+    preds_at_th6 = (distances < th6).int()
 
     accuracy_at_dynamic_th = (preds_at_dynamic_th == labels).float().mean().item()
     accuracy_th1 = (preds_at_th1 == labels).float().mean().item()
@@ -78,4 +80,5 @@ def compute_accuracy_score(model, loader):
     accuracy_th3 = (preds_at_th3 == labels).float().mean().item()
     accuracy_th4 = (preds_at_th4 == labels).float().mean().item()
     accuracy_th5 = (preds_at_th5 == labels).float().mean().item()
-    return ((dynamic_threshold,accuracy_at_dynamic_th), (th1,accuracy_th1), (th2,accuracy_th2), (th3,accuracy_th3), (th4,accuracy_th4), (th5,accuracy_th5))
+    accuracy_th6 = (preds_at_th6 == labels).float().mean().item()
+    return ((dynamic_threshold,accuracy_at_dynamic_th), (th1,accuracy_th1), (th2,accuracy_th2), (th3,accuracy_th3), (th4,accuracy_th4), (th5,accuracy_th5), (th6,accuracy_th6))

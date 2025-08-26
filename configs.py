@@ -1,8 +1,9 @@
+import torch
 #model
-LEARNING_RATE = 0.0001
-EPOCHS = 120
+LEARNING_RATE = 0.01
+EPOCHS = 150
 ALPHA = 0.3
-EMBEDDING_DIM = 128
+EMBEDDING_DIM = 256
 
 # ds
 PER_SUBJECT_SAMPLES = 4
@@ -20,9 +21,12 @@ LOG = True
 PRINT_EVERY = 20
 
 #train
-BATCH_SIZE = 12
+BATCH_SIZE = 16
 SAVE_EVERY = 4
+
+#scheduler
+##on plateau
 PATIENCE = 8
 LR_REDUCTION_FACTOR = 0.5
-MODE = 'min'
 MIN_LR = 0.00001
+MODE = 'min'
