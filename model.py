@@ -16,9 +16,9 @@ class CringeNet(nn.Module):
         for p in self.backbone.parameters():
             p.requires_grad = False
 
-        # for name, param in self.backbone.named_parameters():
-        #     if "7" in name or "6" in name or "5" in name or "4" in name:
-        #         param.requires_grad = True
+        for name, param in self.backbone.named_parameters():
+            if "7" in name or "6" in name:
+                param.requires_grad = True
 
 
         # this tweak was suggested by GPT

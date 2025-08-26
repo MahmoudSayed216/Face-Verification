@@ -1,6 +1,6 @@
-from torchvision.models import resnet50, ResNet50_Weights
+from torchvision.models import convnext_small, ConvNeXt_Small_Weights
 import torch
-model = resnet50(weights = None)
+model = convnext_small(weights = None)
 
 # print(model)
 layers = [*model.children()]
