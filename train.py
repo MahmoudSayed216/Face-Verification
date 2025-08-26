@@ -88,7 +88,6 @@ def train(session_path, train_loader, test_loader):
             print(f"accuracy @{th:.2f}: ", acc, " [dynamic threhsold]" if i == 0 else "")
             i+=1
         checkpointer.save_model(accuracy_scores[0][1], epoch)
-        # scheduler.step(test_loss)
         scheduler.step()
         print("LEARNING RATE: ", scheduler.get_last_lr())
         writer.add_scalar("Loss/test", test_loss)

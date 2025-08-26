@@ -81,4 +81,10 @@ def compute_accuracy_score(model, loader):
     accuracy_th4 = (preds_at_th4 == labels).float().mean().item()
     accuracy_th5 = (preds_at_th5 == labels).float().mean().item()
     accuracy_th6 = (preds_at_th6 == labels).float().mean().item()
-    return ((dynamic_threshold,accuracy_at_dynamic_th), (th1,accuracy_th1), (th2,accuracy_th2), (th3,accuracy_th3), (th4,accuracy_th4), (th5,accuracy_th5), (th6,accuracy_th6))
+    return ((dynamic_threshold,accuracy_at_dynamic_th),
+            (th1,accuracy_th1), 
+            (th2,accuracy_th2), 
+            (th3,accuracy_th3), 
+            (th4,accuracy_th4), 
+            (th5,accuracy_th5), 
+            (th6,accuracy_th6))
