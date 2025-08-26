@@ -74,7 +74,7 @@ def compute_loss(model, loader, loss_fn):
 def get_n_p_pairs(distance_matrix):
     n_p_pairs = []
     for i in range(len(distance_matrix)):
-        row = distance_matrix[i].clone()
+        row :torch.Tensor= distance_matrix[i].clone()
         
         # Find the range of images for the same person
         person_start = (i // configs.PER_SUBJECT_SAMPLES) * configs.PER_SUBJECT_SAMPLES
@@ -96,7 +96,7 @@ def form_triplets(embeddings, n_p_pairs):
     # anchors = embeddings
     positives = []
     negatives = []
-    for embedding, pair in zip(embeddings, n_p_pairs):
+    for pair in  n_p_pairs:
         p, n = pair
         positives.append(embeddings[p])
         negatives.append(embeddings[n])
