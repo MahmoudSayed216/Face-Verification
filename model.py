@@ -1,20 +1,24 @@
 from torchvision.models import convnext_small, ConvNeXt_Small_Weights
+from torchvision.models import resnet101, ResNet101_Weights
+
 import torch.nn as nn
 import configs
 
 class CringeNet(nn.Module):
     def __init__(self):
         super(CringeNet, self).__init__()
-        self.backbone = convnext_small(weights = ConvNeXt_Small_Weights).features
+        # self.backbone = .features
+        layers = [*resnet101(weights = ResNet101_Weights).children()][:-1]
+        self.backbone = nn.Sequential(*layers)
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
-        self.embedder = nn.Linear(768, configs.EMBEDDING_DIM)
+        self.embedder = nn.Linear(2048, configs.EMBEDDING_DIM)
         
         for p in self.backbone.parameters():
             p.requires_grad = False
 
-        for name, param in self.backbone.named_parameters():
-            if "7" in name or "6" in name or "5" in name or "4" in name:
-                param.requires_grad = True
+        # for name, param in self.backbone.named_parameters():
+        #     if "7" in name or "6" in name or "5" in name or "4" in name:
+        #         param.requires_grad = True
 
 
         # this tweak was suggested by GPT

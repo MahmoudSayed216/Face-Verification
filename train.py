@@ -70,41 +70,47 @@ def compute_loss(model, loader, loss_fn):
     return sum(losses)/len(losses)
 
 
-
 def get_n_p_pairs(distance_matrix):
-    n_p_pairs = []
+    triplets = []  # Changed from n_p_pairs to triplets
     for i in range(len(distance_matrix)):
-        row :torch.Tensor= distance_matrix[i].clone()
+        row = distance_matrix[i].clone()
         
         # Find the range of images for the same person
         person_start = (i // configs.PER_SUBJECT_SAMPLES) * configs.PER_SUBJECT_SAMPLES
         person_end = person_start + configs.PER_SUBJECT_SAMPLES
         
-        # Mask out same person's embeddings for negative selection
-        row[person_start:person_end] = float('inf')
-        neg_idx = row.argmin(0)
-        
-        # Pick a random positive from the same person (excluding self)
+        # Get all possible positives for this anchor (same person, excluding self)
         same_person_indices = list(range(person_start, person_end))
         same_person_indices.remove(i)  # Remove anchor itself
-        pos_idx = random.choice(same_person_indices)
         
-        n_p_pairs.append((pos_idx, neg_idx))
-    return n_p_pairs
+        # Mask out same person's embeddings for negative selection
+        row[person_start:person_end] = float('inf')
+        
+        # Get top-k hardest negatives (you can adjust k)
+        k_hardest_negatives = 3  # Adjust this number based on your needs
+        _, neg_indices = torch.topk(row, k_hardest_negatives, largest=False)
+        
+        # Create triplets: anchor with each positive and each hard negative
+        for pos_idx in same_person_indices:
+            for neg_idx in neg_indices:
+                triplets.append((i, pos_idx, neg_idx.item()))  # (anchor, positive, negative)
+    
+    return triplets
 
-def form_triplets(embeddings, n_p_pairs):
-    # anchors = embeddings
+def form_triplets(embeddings, triplets):
+    anchors = []
     positives = []
     negatives = []
-    for pair in  n_p_pairs:
-        p, n = pair
-        positives.append(embeddings[p])
-        negatives.append(embeddings[n])
+    
+    for anchor_idx, pos_idx, neg_idx in triplets:
+        anchors.append(embeddings[anchor_idx])
+        positives.append(embeddings[pos_idx])
+        negatives.append(embeddings[neg_idx])
         
+    anchors = torch.stack(anchors)
     positives = torch.stack(positives)
     negatives = torch.stack(negatives)
-    return positives, negatives
-
+    return anchors, positives, negatives
 
 
 def compute_accuracy(model, loader):
@@ -122,12 +128,12 @@ def compute_accuracy(model, loader):
             B, N, L = embeddings.shape
             embeddings = embeddings.view(B * N, L)
             distance_matrix = compute_distance_matrix(embeddings)
-            pairs = get_n_p_pairs(distance_matrix)
-            ps, ns = form_triplets(embeddings, pairs)
+            triplets = get_n_p_pairs(distance_matrix)
+            anchors, ps, ns = form_triplets(embeddings, triplets)
             
             # distances
-            pos_dist = torch.norm(embeddings - ps, dim=1)  # D(a,p)
-            neg_dist = torch.norm(embeddings - ns, dim=1)  # D(a,n)
+            pos_dist = torch.norm(anchors - ps, dim=1)  # D(a,p)
+            neg_dist = torch.norm(anchors - ns, dim=1)  # D(a,n)
             
             distances.extend(pos_dist.cpu().numpy())
             labels.extend([1]*len(pos_dist))  # 1 = same
@@ -172,9 +178,9 @@ def train(session_path, train_loader, test_loader):
             B, N, L = embeddings.shape
             embeddings = embeddings.view(B * N, L)  # (n, d)
             distance_matrix = compute_distance_matrix(embeddings)
-            pairs = get_n_p_pairs(distance_matrix)
-            ps, ns = form_triplets(embeddings, pairs)
-            loss = loss_fn(embeddings, ps, ns)
+            triplets = get_n_p_pairs(distance_matrix)
+            anc, ps, ns = form_triplets(embeddings, triplets)
+            loss = loss_fn(anc, ps, ns)
             writer.add_scalar("Loss/train", loss.item(), epoch)
             loss.backward()
             optim.step()
