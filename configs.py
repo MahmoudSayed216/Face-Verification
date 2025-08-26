@@ -1,8 +1,8 @@
 import torch
 #model
 LEARNING_RATE = 0.0001
-EPOCHS = 200
-ALPHA = 0.3
+EPOCHS = 240
+ALPHA = 0.4
 EMBEDDING_DIM = 128
 
 # ds
@@ -25,8 +25,11 @@ BATCH_SIZE = 16
 SAVE_EVERY = 4
 
 #scheduler
-##on plateau
+##On Plateau
 PATIENCE = 8
 LR_REDUCTION_FACTOR = 0.5
 MIN_LR = 0.0000005
 MODE = 'min'
+
+##Cosine Annealing
+T_MAX = 30

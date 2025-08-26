@@ -58,7 +58,7 @@ def train(session_path, train_loader, test_loader):
     checkpointer = CheckpointHandler(model, optim, configs.SAVE_EVERY, session_path)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode=configs.MODE, factor=configs.LR_REDUCTION_FACTOR, patience=configs.PATIENCE, min_lr=configs.MIN_LR)
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, mode=configs.MODE, factor=configs.LR_REDUCTION_FACTOR, patience=configs.PATIENCE, min_lr=configs.MIN_LR)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=40, eta_min=configs.MIN_LR)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=configs.T_MAX, eta_min=configs.MIN_LR)
     loss_fn = TripletLoss(configs.ALPHA)
     print(configs.DEVICE)
     for epoch in range(configs.EPOCHS):
@@ -91,6 +91,7 @@ def train(session_path, train_loader, test_loader):
         scheduler.step()
         print("LEARNING RATE: ", scheduler.get_last_lr())
         writer.add_scalar("Loss/test", test_loss)
+        writer.add_scalar("accuracy/test", accuracy_scores[0][1])
         print("*"*30)
     checkpointer.save(accuracy_scores[0][1], epoch)
     writer.close()
