@@ -17,7 +17,7 @@ class CringeNet(nn.Module):
             p.requires_grad = False
 
         for name, param in self.backbone.named_parameters():
-            if "7" in name or "6" in name or "5" in name:
+            if "7" in name or "6" in name:
                 param.requires_grad = True
 
 
@@ -31,7 +31,7 @@ class CringeNet(nn.Module):
         B, N, C, H, W = images.shape
         x = images.view(B * N, C, H, W)        
         x = self.backbone(x)                   
-        x = self.adaptive_avg_pooling(x)       
+        # x = self.adaptive_avg_pooling(x)       
         x = x.view(B * N, -1)                  
         x = self.embedder(x)                   
         x = nn.functional.normalize(x, p=2, dim=1)

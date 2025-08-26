@@ -58,9 +58,24 @@ def compute_accuracy_score(model, loader):
     # simple threshold selection: midpoint between mean pos/neg distances
     pos_mean = distances[labels==1].mean()
     neg_mean = distances[labels==0].mean()
-    threshold = (pos_mean + neg_mean) / 2
-    print("threshold: ", threshold)
+    dynamic_threshold = (pos_mean + neg_mean) / 2
+    th1 = 0.3
+    th2 = 0.4
+    th3 = 0.5
+    th4 = 0.7
+    th5 = 0.9
     
-    preds = (distances < threshold).int()
-    accuracy = (preds == labels).float().mean().item()
-    return accuracy
+    preds_at_dynamic_th = (distances < dynamic_threshold).int()
+    preds_at_th1 = (distances < th1).int()
+    preds_at_th2 = (distances < th2).int()
+    preds_at_th3 = (distances < th3).int()
+    preds_at_th4 = (distances < th4).int()
+    preds_at_th5 = (distances < th5).int()
+
+    accuracy_at_dynamic_th = (preds_at_dynamic_th == labels).float().mean().item()
+    accuracy_th1 = (preds_at_th1 == labels).float().mean().item()
+    accuracy_th2 = (preds_at_th2 == labels).float().mean().item()
+    accuracy_th3 = (preds_at_th3 == labels).float().mean().item()
+    accuracy_th4 = (preds_at_th4 == labels).float().mean().item()
+    accuracy_th5 = (preds_at_th5 == labels).float().mean().item()
+    return ((dynamic_threshold,accuracy_at_dynamic_th), (th1,accuracy_th1), (th2,accuracy_th2), (th3,accuracy_th3), (th4,accuracy_th4), (th5,accuracy_th5))

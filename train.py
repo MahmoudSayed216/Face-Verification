@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from TripletsFormer import compute_distance_matrix, form_triplets, get_a_n_p_pairs
 from logger import Logger 
 from metrics import compute_accuracy_score, compute_triplet_loss
+from checkpointer import CheckpointHandler
 
 
 def get_loaders():
@@ -52,9 +53,9 @@ def train(session_path, train_loader, test_loader):
     #TODO: tensorboard
     tensorboard_logs_path = f"{session_path}/runs/experiment1"
     writer = SummaryWriter(tensorboard_logs_path)
-
     model = CringeNet().to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
+    checkpointer = CheckpointHandler(model, optim, configs.SAVE_EVERY, session_path)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode=configs.MODE, factor=configs.LR_REDUCTION_FACTOR, patience=configs.PATIENCE, min_lr=configs.MIN_LR)
     loss_fn = TripletLoss(configs.ALPHA)
     print(configs.DEVICE)
@@ -79,14 +80,18 @@ def train(session_path, train_loader, test_loader):
 
 
         test_loss = compute_triplet_loss(model, test_loader, loss_fn)
-        accuracy =  compute_accuracy_score(model, test_loader)
+        accuracy_scores =  compute_accuracy_score(model, test_loader)
         print("test loss: ",test_loss)
-        print("test accuracy: ", accuracy)
+        i = 0
+        for th, acc in accuracy_scores:
+            print(f"accuracy @{th:.2f}: ", acc, " [dynamic threhsold]" if i == 0 else "")
+            i+=1
+        checkpointer.save_model(accuracy_scores[0][0], epoch)
         scheduler.step(test_loss)
         print("LEARNING RATE: ", scheduler.get_last_lr())
         writer.add_scalar("Loss/test", test_loss)
-        print("_"*30)
-
+        print("*"*30)
+    checkpointer.save(accuracy_scores[0][0], epoch)
     writer.close()
 
     

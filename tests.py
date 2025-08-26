@@ -1,9 +1,9 @@
-from torchvision.models import convnext_small, ConvNeXt_Small_Weights
+from torchvision.models import resnet101, ConvNeXt_Small_Weights
 import torch
-model = convnext_small(weights = None)
+model = resnet101(weights = None)
 
 # print(model)
-layers = [*model.children()]
+layers = [*model.children()][:-1]
 model = torch.nn.Sequential(*layers)
 print(model)
 print(type(model))
