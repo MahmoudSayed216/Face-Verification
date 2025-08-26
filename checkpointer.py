@@ -1,5 +1,5 @@
 import torch
-from logger import CHECKPOINT
+from logger import Logger
 
 class CheckpointHandler:
     def __init__(self, model, optim, save_every, output_path):
@@ -20,12 +20,12 @@ class CheckpointHandler:
             },
             f'{self.output_path}/weights/{_type}.pth')
 
-        CHECKPOINT(f"{_type} updated")
+        Logger.CHECKPOINT(f"{_type} updated")
         # self.writer.add_line(f"{_type} updated")
 
     def _save_if_improved(self, current_value, epoch):
         if current_value > self.past_value:
-            CHECKPOINT()
+            
             self._save_data(current_value, epoch, 'best')
             self.past_value = current_value
 
