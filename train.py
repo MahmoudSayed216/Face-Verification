@@ -61,9 +61,9 @@ def compute_loss(model, loader, loss_fn):
         B, N, L = embeddings.shape
         embeddings = embeddings.view(B * N, L)  # (n, d)
         distance_matrix = compute_distance_matrix(embeddings)
-        pairs = get_n_p_pairs(distance_matrix)
-        ps, ns = form_triplets(embeddings, pairs)
-        loss = loss_fn(embeddings, ps, ns)
+        tripletes = get_n_p_pairs(distance_matrix)
+        anc, ps, ns = form_triplets(embeddings, tripletes)
+        loss = loss_fn(anc, ps, ns)
     
         losses.append(loss.item())
 
