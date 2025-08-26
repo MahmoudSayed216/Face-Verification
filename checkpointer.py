@@ -18,7 +18,7 @@ class CheckpointHandler:
             'optimizer_state_dict': self.optim.state_dict(),
             'metric': current_value
             },
-            f'{self.output_path}/weights/{_type}.pth')
+            f'{self.output_path}/{_type}.pth')
 
         Logger.CHECKPOINT(f"{_type} updated")
         # self.writer.add_line(f"{_type} updated")
