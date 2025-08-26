@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from TripletsFormer import compute_distance_matrix, form_triplets, get_a_n_p_pairs
 from logger import Logger 
-from test import compute_accuracy, compute_loss
+from metrics import compute_accuracy_score, compute_triplet_loss
 
 
 def get_loaders():
@@ -78,8 +78,8 @@ def train(session_path, train_loader, test_loader):
                 print("train batch loss: ", loss.item())
 
 
-        test_loss = compute_loss(model, test_loader, loss_fn)
-        accuracy =  compute_accuracy(model, test_loader)
+        test_loss = compute_triplet_loss(model, test_loader, loss_fn)
+        accuracy =  compute_accuracy_score(model, test_loader)
         print("test loss: ",test_loss)
         print("test accuracy: ", accuracy)
         scheduler.step(test_loss)

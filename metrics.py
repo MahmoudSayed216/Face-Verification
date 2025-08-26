@@ -3,7 +3,8 @@ import configs
 
 
 from TripletsFormer import compute_distance_matrix, form_triplets, get_a_n_p_pairs
-def compute_loss(model, loader, loss_fn):
+
+def compute_triplet_loss(model, loader, loss_fn):
     model.eval()
     losses = []
     with torch.no_grad():
@@ -11,7 +12,7 @@ def compute_loss(model, loader, loss_fn):
             input = input.to(configs.DEVICE)
             embeddings = model(input)
             B, N, L = embeddings.shape
-            embeddings = embeddings.view(B * N, L)  # (n, d)
+            embeddings = embeddings.view(B * N, L)
             distance_matrix = compute_distance_matrix(embeddings)
             tripletes = get_a_n_p_pairs(distance_matrix)
             anc, ps, ns = form_triplets(embeddings, tripletes)
@@ -24,9 +25,7 @@ def compute_loss(model, loader, loss_fn):
 
 
 
-
-
-def compute_accuracy(model, loader):
+def compute_accuracy_score(model, loader):
     """
     Compute verification accuracy for a Siamese/triplet network.
     Returns the accuracy (0-1).
@@ -37,7 +36,7 @@ def compute_accuracy(model, loader):
     with torch.no_grad():
         for input in loader:
             input = input.to(configs.DEVICE)
-            embeddings = model(input)  # (B, N, L)
+            embeddings = model(input)
             B, N, L = embeddings.shape
             embeddings = embeddings.view(B * N, L)
             distance_matrix = compute_distance_matrix(embeddings)
@@ -45,8 +44,8 @@ def compute_accuracy(model, loader):
             anchors, ps, ns = form_triplets(embeddings, triplets)
             
             # distances
-            pos_dist = torch.norm(anchors - ps, dim=1)  # D(a,p)
-            neg_dist = torch.norm(anchors - ns, dim=1)  # D(a,n)
+            pos_dist = torch.norm(anchors - ps, dim=1)
+            neg_dist = torch.norm(anchors - ns, dim=1)
             
             distances.extend(pos_dist.cpu().numpy())
             labels.extend([1]*len(pos_dist))  # 1 = same
@@ -60,6 +59,7 @@ def compute_accuracy(model, loader):
     pos_mean = distances[labels==1].mean()
     neg_mean = distances[labels==0].mean()
     threshold = (pos_mean + neg_mean) / 2
+    print("threshold: ", threshold)
     
     preds = (distances < threshold).int()
     accuracy = (preds == labels).float().mean().item()
