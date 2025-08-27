@@ -14,7 +14,7 @@ class CringeNet(nn.Module):
         self.backbone = convnext.features  # this keeps the real DenseNet features
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
         self.flatter = nn.Flatten()
-        self.embedder = nn.Linear(2208, embedding_dim)
+        self.embedder = nn.Linear(1024, embedding_dim)
 
         # Freeze everything
         for p in self.backbone.parameters():
