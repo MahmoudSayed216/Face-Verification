@@ -6,21 +6,20 @@ import torch.nn as nn
 import configs
 
 class CringeNet(nn.Module):
-    def __init__(self):
+    def __init__(self, embedding_dim=128):
         super(CringeNet, self).__init__()
-        # self.backbone = .features
-        layers = [*densenet161(weights = DenseNet161_Weights).children()][:-1]
-        self.backbone = nn.Sequential(*layers)
+        densenet = densenet161(weights=None)
+        self.backbone = densenet.features  # this keeps the real DenseNet features
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
         self.flatter = nn.Flatten()
-        self.embedder = nn.Linear(2208, configs.EMBEDDING_DIM)
-        
+        self.embedder = nn.Linear(2208, embedding_dim)
+
+        # Freeze everything
         for p in self.backbone.parameters():
             p.requires_grad = False
-
-        # for name, param in self.backbone.named_parameters():
-        #     if "7" in name or "6" in name:
-        #         param.requires_grad = True
+        # Unfreeze only last dense block
+        for p in self.backbone.denseblock4.parameters():
+            p.requires_grad = True
 
 
         # this tweak was suggested by GPT
