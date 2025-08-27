@@ -8,7 +8,7 @@ import configs
 class CringeNet(nn.Module):
     def __init__(self, embedding_dim=128):
         super(CringeNet, self).__init__()
-        densenet = densenet161(weights=None)
+        densenet = densenet161(weights=DenseNet161_Weights)
         self.backbone = densenet.features  # this keeps the real DenseNet features
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
         self.flatter = nn.Flatten()
