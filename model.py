@@ -11,9 +11,9 @@ class CringeNet(nn.Module):
         # self.backbone = .features
         layers = [*densenet161(weights = DenseNet161_Weights).children()][:-1]
         self.backbone = nn.Sequential(*layers)
-        # self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
+        self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
         self.flatter = nn.Flatten()
-        self.embedder = nn.Linear(2048, configs.EMBEDDING_DIM)
+        self.embedder = nn.Linear(2208, configs.EMBEDDING_DIM)
         
         for p in self.backbone.parameters():
             p.requires_grad = False
@@ -33,8 +33,8 @@ class CringeNet(nn.Module):
         B, N, C, H, W = images.shape
         x = images.view(B * N, C, H, W)        
         x = self.backbone(x)   
-        x = self.flatter(x)                
-        # x = self.adaptive_avg_pooling(x)       
+        # x = self.flatter(x)                
+        x = self.adaptive_avg_pooling(x)       
         x = x.view(B * N, -1)                  
         x = self.embedder(x)                   
         x = nn.functional.normalize(x, p=2, dim=1)
