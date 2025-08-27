@@ -1,6 +1,7 @@
-from torchvision.models import convnext_small, ConvNeXt_Small_Weights
-from torchvision.models import resnet101, ResNet101_Weights
-from torchvision.models import densenet161, DenseNet161_Weights
+# from torchvision.models import convnext_small, ConvNeXt_Small_Weights
+from torchvision.models import convnext_base, ConvNeXt_Base_Weights
+# from torchvision.models import resnet101, ResNet101_Weights
+# from torchvision.models import densenet161, DenseNet161_Weights
 
 import torch.nn as nn
 import configs
@@ -8,8 +9,9 @@ import configs
 class CringeNet(nn.Module):
     def __init__(self, embedding_dim=128):
         super(CringeNet, self).__init__()
-        densenet = densenet161(weights=DenseNet161_Weights)
-        self.backbone = densenet.features  # this keeps the real DenseNet features
+        # densenet = densenet161(weights=DenseNet161_Weights)
+        convnext = convnext_base(weights=ConvNeXt_Base_Weights)
+        self.backbone = convnext.features  # this keeps the real DenseNet features
         self.adaptive_avg_pooling = nn.AdaptiveAvgPool2d(1)
         self.flatter = nn.Flatten()
         self.embedder = nn.Linear(2208, embedding_dim)
@@ -17,8 +19,8 @@ class CringeNet(nn.Module):
         # Freeze everything
         for p in self.backbone.parameters():
             p.requires_grad = False
-        # Unfreeze only last dense block
-        for p in self.backbone.denseblock4.parameters():
+        
+        for p in self.backbone[-1][-1].parameters():
             p.requires_grad = True
 
 
