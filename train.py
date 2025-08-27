@@ -53,7 +53,7 @@ def train(session_path, train_loader, test_loader):
     #TODO: tensorboard
     tensorboard_logs_path = f"{session_path}/runs/experiment1"
     writer = SummaryWriter(tensorboard_logs_path)
-    model = CringeNet().to(configs.DEVICE)
+    model = CringeNet(configs.EMBEDDING_DIM).to(configs.DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=configs.LEARNING_RATE)
     checkpointer = CheckpointHandler(model, optim, configs.SAVE_EVERY, session_path)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode=configs.MODE, factor=configs.LR_REDUCTION_FACTOR, patience=configs.PATIENCE, min_lr=configs.MIN_LR)
